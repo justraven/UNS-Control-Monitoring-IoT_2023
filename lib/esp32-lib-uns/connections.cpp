@@ -49,6 +49,7 @@ connections_flags_t connections_start_ap (connections_hwdata_t *hwdata) {
     }
 
     WiFi.disconnect();
+    WiFi.mode(WIFI_AP);
     WiFi.softAP(ssid.c_str(), CONNECTIONS_AP_PASS);
     WiFi.hostname(ssid.c_str());
 

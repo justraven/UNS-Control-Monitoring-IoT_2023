@@ -42,12 +42,14 @@ void dvtask_sensors (void *pvParameters) {
 
     time_keeping_t elapsed_mins = {
         .hour = 0,
-        .minute = 15,
+        .minute = 1,
         .second = 0
     };
 
     while (1) {
-        if (WiFi.status() == WL_CONNECTED && time_keeping_multiple_mins(__time_keeping, elapsed_mins)) {
+        if ( WiFi.status() == WL_CONNECTED 
+             && time_keeping_multiple_mins(__time_keeping, elapsed_mins)
+             && (__time_keeping.second == 0) ) {
             sensors_data = sensors_sample();
 
             thingspeak = (thingspeak_t) {
@@ -95,8 +97,14 @@ void dvtask_single_establish_connection (void) {
 
     const uint8_t max_timeout = 10;
     if (connections_flags == CONNECTIONS_SPIFFS_OK) {
+        // remove the newlines from the end of the string
+        hwdata.ssid.trim();
+        hwdata.password.trim();
+
+        WiFi.mode(WIFI_STA);
         WiFi.begin(hwdata.ssid.c_str(), hwdata.password.c_str());
-        Serial.println("[INFO] Connecting to " + hwdata.ssid);
+        Serial.println("[INFO] Connecting to " + hwdata.ssid + "[" + String(hwdata.ssid.length()) + "]");
+        Serial.println("[INFO] Password : " + hwdata.password + "[" + String(hwdata.password.length()) + "]");
         
         for (uint8_t x=0;x<max_timeout;x++) {
             Serial.print("[INFO] Timeout : " + String(max_timeout - x) + " ");
@@ -106,6 +114,7 @@ void dvtask_single_establish_connection (void) {
             }
             
             if (WiFi.status() == WL_CONNECTED) {
+                Serial.println("\n[INFO] Connected to " + hwdata.ssid);
                 hwdata.ipaddr = WiFi.localIP().toString();
                 hwdata.macaddr = WiFi.macAddress();
                 break;
@@ -113,10 +122,12 @@ void dvtask_single_establish_connection (void) {
 
             delay(1000);
         }
-        Serial.println("");
+    }
 
-        Serial.println("[INFO] Connected to " + hwdata.ssid);
-    } else {
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("[ERROR] Failed to connect to " + hwdata.ssid);
+        Serial.println("[INFO] Starting AP...");
+
         connections_flags = connections_start_ap(&hwdata);
         if (connections_flags != CONNECTIONS_SUCCESS) {
             status_blink(STATUS_WLAN_ERROR, 5, STATUS_DEFAULT_DELAY_MS);
