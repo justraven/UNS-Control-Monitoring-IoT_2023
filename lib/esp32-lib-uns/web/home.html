@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>UNS Matching Funds Device</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <style>
+            html {
+                background: linear-gradient(to bottom, #00a8ff, #192a56);
+                color: #ecf0f1;
+                font-family: Arial, Helvetica, sans-serif;
+                height: 100%;
+            }
+
+            #home-title {
+                background-color: #34495e;
+                color: #ecf0f1;
+                padding: 10px;
+                border-radius: 5px;
+                border-bottom: 10px solid #2c3e50;
+                text-align: center;
+                font-size: 30px;
+                margin-top: 20px;
+                font-weight: bold;
+            }
+
+            .container {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                flex-wrap: wrap;
+                margin-top: 5px;
+            }
+
+            .cargo {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                width: 300px;
+                height: 200px;
+                background-color: #34495e;
+                color: #ecf0f1;
+                border-radius: 15px;
+                margin: 10px;
+                padding: 5px;
+                border: 10px solid #2c3e50;
+                font-size: 25px;
+            }
+
+            #properties {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+                align-items: center;
+                flex-wrap: wrap;
+                background-color: #34495e;
+                color: #ecf0f1;
+                border-radius: 5px;
+                margin: 10px;
+                padding: 5px;
+                border-bottom: 10px solid #2c3e50;
+                font-size: 25px;
+            }
+
+            #properties p {
+                background-color: #415972;
+                padding: 10px 30px;
+                border-radius: 30px;
+                margin: 8px;
+            }
+
+            #configure {
+                background-color: #3498db;
+                color: #ecf0f1;
+                padding: 10px;
+                border-radius: 5px;
+                border-bottom: 10px solid #2980b9;
+                text-align: center;
+                font-size: 20px;
+                margin-top: 30px;
+                margin-bottom: 10px;
+                font-weight: bold;
+                text-decoration: none;
+            }
+
+            #configure:hover {
+                transform: translate(2px, 2px);
+                background-color: #2980b9;
+                border-bottom: 10px solid #3498db;
+            }
+        </style>
+
+        <script>
+            function updateData() {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200){
+                        var data = JSON.parse(this.responseText);
+                        document.getElementById("temp-value").innerHTML = data.temperature;
+                        document.getElementById("hum-value").innerHTML = data.humidity;
+                        document.getElementById("ph-value").innerHTML = data.ph;
+                        document.getElementById("soil-value").innerHTML = data.soil;
+                        document.getElementById("als-value").innerHTML = data.als;
+                        document.getElementById("dev-id").innerHTML = data.id;
+                    }
+                };
+                xhttp.open("GET", "data", true);
+                xhttp.send();
+            }
+
+            setInterval(updateData, 1000);
+        </script>
+    </head>
+    <body>
+        <div id="home-title">UNS Web Monitor</div>
+        <div class="container">
+            <div class="cargo">
+                <p>Temperature</p>
+                <p><span id="temp-value">0.0</span>&#8451;</p> 
+            </div>
+            <div class="cargo">
+                <p>Humidity</p>
+                <p><span id="hum-value">0.0</span>%</p>
+            </div>
+            <div class="cargo">
+                <p>Soil pH</p>
+                <p><span id="ph-value">0.0</span></p>
+            </div>
+            <div class="cargo">
+                <p>Soil Moisture</p>
+                <p><span id="soil-value">0.0</span>%</p>
+            </div>
+            <div class="cargo">
+                <p>Ambient Light</p>
+                <p><span id="als-value">0.0</span> lux</p>
+            </div>
+        </div>
+        <div id="properties">
+            <p>Device ID : <span id="dev-id">0</span></p>
+
+            <a href="/configure" id="configure">Configure &#9881;</a>
+        </div>
+    </body>
+</html>
