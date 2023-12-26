@@ -6,8 +6,6 @@
 
 #include "device_task.h"
 
-static time_keeping_t __time_keeping = {0};
-
 void device_task_init (void) {
     dvtask_single_establish_connection();
 
@@ -17,21 +15,27 @@ void device_task_init (void) {
 }
 
 void dvtask_time_keeping (void *pvParameters) {
+    time_keeping_t hwtime = {
+        .hour = 0,
+        .minute = 0,
+        .second = 0
+    };
+
     while (1) {
-        __time_keeping.second++;
+        hwtime.second++;
 
-        if (__time_keeping.second >= 60) {
-            __time_keeping.second = 0;
-            __time_keeping.minute++;
-        }
-        if (__time_keeping.minute >= 60) {
-            __time_keeping.minute = 0;
-            __time_keeping.hour++;
-        }
-        if (__time_keeping.hour >= 24) {
-            __time_keeping.hour = 0;
+        if (hwtime.second >= 60) {
+            hwtime.second = 0;
+            hwtime.minute++;
+        } else if (hwtime.minute >= 60) {
+            hwtime.minute = 0;
+            hwtime.hour++;
+        } else if (hwtime.hour >= 24) {
+            hwtime.hour = 0;
         }
 
+        // update time keeping
+        time_keeping_set(hwtime);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
@@ -40,16 +44,19 @@ void dvtask_sensors (void *pvParameters) {
     sensors_data_t sensors_data;
     thingspeak_t thingspeak;
 
+    time_keeping_t run_time = time_keeping_get();
     time_keeping_t elapsed_mins = {
         .hour = 0,
-        .minute = 1,
+        .minute = 15,
         .second = 0
     };
 
     while (1) {
+        run_time = time_keeping_get();
+
         if ( WiFi.status() == WL_CONNECTED 
-             && time_keeping_multiple_mins(__time_keeping, elapsed_mins)
-             && (__time_keeping.second == 0) ) {
+             && time_keeping_multiple_mins(run_time, elapsed_mins)
+             && (run_time.second == 0) ) {
             sensors_data = sensors_sample();
 
             thingspeak = (thingspeak_t) {
@@ -153,22 +160,6 @@ void dvtask_single_establish_connection (void) {
     Serial.println("[INFO] Server initialized.");
     Serial.println("[INFO] IP address: " + hwdata.ipaddr);
     Serial.println("[INFO] MAC address: " + hwdata.macaddr);
-}
-
-uint8_t time_keeping_compare (time_keeping_t first, time_keeping_t second) {
-    if (first.hour == second.hour && first.minute == second.minute && first.second == second.second) {
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
-uint8_t time_keeping_multiple_mins (time_keeping_t first, time_keeping_t multiple) {
-    if ((first.minute % multiple.minute) == 0) {
-        return 1;
-    } else {
-        return 0;
-    }
 }
 
 

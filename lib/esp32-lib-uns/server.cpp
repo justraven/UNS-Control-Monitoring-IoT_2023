@@ -121,6 +121,7 @@ void server_handle_home (void) { // show home page
     document.getElementById("soil-value").innerHTML = data.soil;
     document.getElementById("als-value").innerHTML = data.als;
     document.getElementById("dev-id").innerHTML = data.device_id;
+    document.getElementById("dev-time").innerHTML = data.device_time;
     }
     };
     xhttp.open("GET", "data", true);
@@ -155,6 +156,7 @@ void server_handle_home (void) { // show home page
     </div>
     <div id="properties">
     <p>Device ID : <span id="dev-id">0</span></p>
+    <p>Device Up Time : <span id="dev-time">0</span></p>
     <a href="/configure" id="configure">Configure &#9881;</a>
     </div>
     </body>
@@ -302,6 +304,8 @@ void server_handle_ajax (void) {
     for (uint8_t x=0;x<6;x++) {
         mac_str += String(mac[x], HEX);
     }
+
+    time_keeping_t dev_time = time_keeping_get();
     
     String json = "{";
     json += "\"temperature\":";
@@ -322,6 +326,15 @@ void server_handle_ajax (void) {
     json += "\"device_id\":";
     json += "\"";
     json += mac_str;
+    json += "\"";
+    json += ",";
+    json += "\"device_time\":"; 
+    json += "\"";
+    json += String(dev_time.hour);
+    json += ":";
+    json += String(dev_time.minute);
+    json += ":";
+    json += String(dev_time.second);
     json += "\"";
     json += "}";
 

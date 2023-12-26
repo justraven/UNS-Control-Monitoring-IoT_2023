@@ -6,6 +6,7 @@
 #include <SPIFFS.h>
 #include "flags.h"
 #include "sensors.h"
+#include "systime.h"
 
 typedef enum {
     SERVER_SUCCESS,
