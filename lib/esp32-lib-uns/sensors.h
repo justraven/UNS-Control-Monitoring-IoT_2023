@@ -6,8 +6,9 @@
 #include <Adafruit_SHTC3.h>
 #include "veml3235.h"
 
-#define SENSORS_SAMPLE_AVERAGE      10
-#define SENSORS_TEMP_OFFSET         2.499f
+#define SENSORS_SAMPLE_AVERAGE      15
+#define SENSORS_TEMP_OFFSET         2.683f
+#define SENSORS_HUMID_OFFSET        8.328f
 
 #define SENSORS_SOIL_MOISTURE_PIN   39
 #define SENSORS_SOIL_PH_PIN         36

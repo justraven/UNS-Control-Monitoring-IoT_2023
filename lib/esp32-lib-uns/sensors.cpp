@@ -19,26 +19,27 @@ void sensors_init (void) {
 }
 
 sensors_data_t sensors_sample (void) {
-    sensors_data_t avg_data = {0};
+    sensors_data_t sensors_avg = {0.0f};
 
     for (uint8_t i = 0; i < SENSORS_SAMPLE_AVERAGE; i++) {
         sensors_data_t sensors_data = sensors_get_data();
-        avg_data.temperature += sensors_data.temperature;
-        avg_data.humidity += sensors_data.humidity;
-        avg_data.ambient_light += sensors_data.ambient_light;
-        avg_data.white_light += sensors_data.white_light;
-        avg_data.soil_moisture += sensors_data.soil_moisture;
-        avg_data.soil_ph += sensors_data.soil_ph;
+        
+        sensors_avg.temperature += sensors_data.temperature;
+        sensors_avg.humidity += sensors_data.humidity;
+        sensors_avg.ambient_light += sensors_data.ambient_light;
+        sensors_avg.white_light += sensors_data.white_light;
+        sensors_avg.soil_moisture += sensors_data.soil_moisture;
+        sensors_avg.soil_ph += sensors_data.soil_ph;
     }
 
-    avg_data.temperature /= SENSORS_SAMPLE_AVERAGE;
-    avg_data.humidity /= SENSORS_SAMPLE_AVERAGE;
-    avg_data.ambient_light /= SENSORS_SAMPLE_AVERAGE;
-    avg_data.white_light /= SENSORS_SAMPLE_AVERAGE;
-    avg_data.soil_moisture /= SENSORS_SAMPLE_AVERAGE;
-    avg_data.soil_ph /= SENSORS_SAMPLE_AVERAGE;
+    sensors_avg.temperature /= SENSORS_SAMPLE_AVERAGE;
+    sensors_avg.humidity /= SENSORS_SAMPLE_AVERAGE;
+    sensors_avg.ambient_light /= SENSORS_SAMPLE_AVERAGE;
+    sensors_avg.white_light /= SENSORS_SAMPLE_AVERAGE;
+    sensors_avg.soil_moisture /= SENSORS_SAMPLE_AVERAGE;
+    sensors_avg.soil_ph /= SENSORS_SAMPLE_AVERAGE;
 
-    return avg_data;
+    return sensors_avg;
 }
 
 sensors_data_t sensors_get_data (void) {
@@ -48,7 +49,7 @@ sensors_data_t sensors_get_data (void) {
     shtc3.getEvent(&humidity, &temperature);
 
     sensors_data.temperature = temperature.temperature - SENSORS_TEMP_OFFSET;
-    sensors_data.humidity = humidity.relative_humidity;
+    sensors_data.humidity = humidity.relative_humidity + SENSORS_HUMID_OFFSET;
 
     sensors_data.ambient_light = veml3235_get_als();
     sensors_data.white_light = veml3235_get_white();
