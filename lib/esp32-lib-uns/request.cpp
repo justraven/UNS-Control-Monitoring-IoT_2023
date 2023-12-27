@@ -35,4 +35,22 @@ request_flags_t request_send_get_http (thingspeak_t *thingspeak) {
     return REQUEST_HTTP_ERR;
 }
 
+request_flags_t request_read_get_http (float *value, uint8_t field) {
+    if (WiFi.status() == WL_CONNECTED) {
+        HTTPClient http;
+        http.begin("http://api.thingspeak.com/channels/" + String(THINGSPEAK_CH_ID) + "/fields/" + String(field) + "/last.json");
+        int http_code = http.GET();
+
+        if (http_code == HTTP_CODE_OK) {
+            String payload = http.getString();
+            int index = payload.indexOf("field" + String(field) + "\":\"") + 9;
+            String value_str = payload.substring(index, index + 5);
+            *value = value_str.toFloat();
+            return REQUEST_HTTP_OK;
+        }
+    }
+
+    return REQUEST_HTTP_ERR;
+}
+
 

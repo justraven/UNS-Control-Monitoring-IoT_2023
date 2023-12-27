@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <Adafruit_SHTC3.h>
+#include "flags.h"
 #include "veml3235.h"
 
 #define SENSORS_SAMPLE_AVERAGE      15

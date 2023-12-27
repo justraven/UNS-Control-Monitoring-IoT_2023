@@ -9,6 +9,9 @@
 Adafruit_SHTC3 shtc3 = Adafruit_SHTC3();
 
 void sensors_init (void) {
+#if !defined(DEVICE_SOIL_MONITOR0) && !defined(DEVICE_SOIL_MONITOR1) && !defined(DEVICE_SOIL_MONITOR2) && !defined(DEVICE_SOIL_MONITOR3) &&\
+    !defined(DEVICE_SOIL_MONITOR4) && !defined(DEVICE_SOIL_MONITOR5) && !defined(DEVICE_SOIL_MONITOR6) && !defined(DEVICE_SOIL_MONITOR7)\
+    && !defined(DEVICE_SOIL_MONITOR8)
     if (!shtc3.begin()) {
         Serial.println("[ERROR] SHTC3 sensor not found.");
     }
@@ -16,6 +19,7 @@ void sensors_init (void) {
     if (veml3235_init() != VEML3235_ID_VALUE) {
         Serial.println("[ERROR] VEML3235 sensor not found.");
     }
+#endif
 }
 
 sensors_data_t sensors_sample (void) {
@@ -45,6 +49,9 @@ sensors_data_t sensors_sample (void) {
 sensors_data_t sensors_get_data (void) {
     sensors_data_t sensors_data = {0};
 
+#if !defined(DEVICE_SOIL_MONITOR0) && !defined(DEVICE_SOIL_MONITOR1) && !defined(DEVICE_SOIL_MONITOR2) && !defined(DEVICE_SOIL_MONITOR3) &&\
+    !defined(DEVICE_SOIL_MONITOR4) && !defined(DEVICE_SOIL_MONITOR5) && !defined(DEVICE_SOIL_MONITOR6) && !defined(DEVICE_SOIL_MONITOR7)\
+    && !defined(DEVICE_SOIL_MONITOR8)
     sensors_event_t humidity, temperature;
     shtc3.getEvent(&humidity, &temperature);
 
@@ -53,9 +60,56 @@ sensors_data_t sensors_get_data (void) {
 
     sensors_data.ambient_light = veml3235_get_als();
     sensors_data.white_light = veml3235_get_white();
+#endif
 
-    sensors_data.soil_moisture = analogRead(SENSORS_SOIL_MOISTURE_PIN);
-    sensors_data.soil_ph = analogRead(SENSORS_SOIL_PH_PIN);
+#if defined(DEVICE_SOIL_MONITOR0) || defined(DEVICE_SOIL_MONITOR1) || defined(DEVICE_SOIL_MONITOR2) || defined(DEVICE_SOIL_MONITOR3) ||\
+    defined(DEVICE_SOIL_MONITOR4) || defined(DEVICE_SOIL_MONITOR5) || defined(DEVICE_SOIL_MONITOR6) || defined(DEVICE_SOIL_MONITOR7)\
+    || defined(DEVICE_SOIL_MONITOR8)
+    float soil_ph_value = 0.0f;
+
+    switch (analogRead(SENSORS_SOIL_MOISTURE_PIN)) {
+        case 0 ... 173:
+            soil_ph_value = 10.0f;
+        break;
+
+        case 174 ... 572:
+            soil_ph_value = 9.0f;
+        break;
+
+        case 573 ... 889:
+            soil_ph_value = 8.0f;
+        break;
+
+        case 890 ... 1073:
+            soil_ph_value = 7.0f;
+        break;
+
+        case 1074 ... 1257:
+            soil_ph_value = 6.0f;
+        break;
+
+        case 1258 ... 1441:
+            soil_ph_value = 5.0f;
+        break;
+
+        case 1442 ... 1625:
+            soil_ph_value = 4.0f;
+        break;
+
+        case 1626 ... 4095:
+            soil_ph_value = 3.0f;
+        break;
+
+        default:
+            soil_ph_value = 0.0f;
+        break;
+    }
+    
+    sensors_data.soil_ph = soil_ph_value;
+    sensors_data.soil_moisture = ((4095.0f - analogRead(SENSORS_SOIL_MOISTURE_PIN))/4095.0f)*100.0f;
+    // sensors_data.soil_moisture = 3.89f;
+    // sensors_data.soil_ph = 3.4f;
+#endif
 
     return sensors_data;
 }
