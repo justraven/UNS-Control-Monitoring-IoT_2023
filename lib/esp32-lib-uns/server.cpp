@@ -12,6 +12,7 @@ void server_init (void) {
     server.on("/", server_handle_home);
     server.on("/configure", HTTP_GET, server_handle_configure);
     server.on("/data", server_handle_ajax);
+    server.on("/ping", server_handle_ping);
     server.onNotFound(server_handle_not_found);
 
     server.begin();
@@ -115,11 +116,22 @@ void server_handle_home (void) { // show home page
     xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200){
     var data = JSON.parse(this.responseText);
-    document.getElementById("temp-value").innerHTML = data.temperature;
-    document.getElementById("hum-value").innerHTML = data.humidity;
-    document.getElementById("ph-value").innerHTML = data.ph;
-    document.getElementById("soil-value").innerHTML = data.soil;
-    document.getElementById("als-value").innerHTML = data.als;
+    if (data.temperature != "" || data.temperature != "0.0") {
+        document.getElementById("temp-value").innerHTML = data.temperature;
+    }
+    if (data.humidity != "" || data.humidity != "0.0") {
+        document.getElementById("hum-value").innerHTML = data.humidity;
+    }
+    if (data.ph != "" || data.ph != "0.0") {
+        document.getElementById("ph-value").innerHTML = data.ph;
+    }
+    if (data.soil != "" || data.soil != "0.0") {
+        document.getElementById("soil-value").innerHTML = data.soil;
+    }
+    if (data.als != "" || data.als != "0.0") {
+        document.getElementById("als-value").innerHTML = data.als;
+    }
+    
     document.getElementById("dev-id").innerHTML = data.device_id;
     document.getElementById("dev-time").innerHTML = data.device_time;
     }
@@ -158,6 +170,7 @@ void server_handle_home (void) { // show home page
     <p>Device ID : <span id="dev-id">0</span></p>
     <p>Device Up Time : <span id="dev-time">0</span></p>
     <a href="/configure" id="configure">Configure &#9881;</a>
+    <a href="/ping" id="configure">Ping &#128515;</a>
     </div>
     </body>
     </html>
@@ -288,15 +301,72 @@ void server_handle_not_found (void) { // show 404 page
     String web_html = String(R"(
     <!DOCTYPE html>
     <html>
+    <head>
+    <meta charset="utf-8">
+    <title>404 Page</title>
+    <style>
+    html {
+    background: linear-gradient(to bottom, #00a8ff, #192a56);
+    color: #ecf0f1;
+    font-family: Arial, Helvetica, sans-serif;
+    height: 100%;
+    }
+    </style>
+    </head>
+    <body>
     <p style="font-size: 72px;font-weight: bold;text-align: center;">(404) There's nothing here bro</p>
+    </body>
     </html>
     )");
 
     server.send(404, "text/html", web_html);
 }
 
+void server_handle_ping (void) {
+    String web_html = String(R"(
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta charset="utf-8">
+    <title>Ping Device</title>
+    <style>
+    html {
+    background: linear-gradient(to bottom, #00a8ff, #192a56);
+    color: #ecf0f1;
+    font-family: Arial, Helvetica, sans-serif;
+    height: 100%;
+    }
+    </style>
+    <script>
+    alert("PONG!");
+    window.location.href = "/";
+    </script>
+    </head>
+    <body>
+    </body>
+    </html>
+    )");
+
+    server.send(200, "text/html", web_html);
+
+    Serial.println("[INFO] Pinged by client.");
+    const color_t color_cycle[] = {COLOR_RED, COLOR_GREEN, COLOR_BLUE};
+    uint8_t color_index = 0;
+
+    // color cycle
+    for (uint8_t x=0;x<3;x++) {
+        for (uint8_t y=0;y<15;y++) {
+            status_rgb_set(color_cycle[color_index]);
+            vTaskDelay(50 / portTICK_PERIOD_MS);
+            status_rgb_set(COLOR_NONE);
+            vTaskDelay(25 / portTICK_PERIOD_MS);
+        }
+        color_index++;
+    }
+}
+
 void server_handle_ajax (void) {
-    sensors_data_t sensors_data = sensors_sample();
+    sensors_data_t sensors_data;
 
     String mac_str;
     uint8_t mac[6];
@@ -306,6 +376,38 @@ void server_handle_ajax (void) {
     }
 
     time_keeping_t dev_time = time_keeping_get();
+    time_keeping_t elapsed_mins = {
+        .hour = ELAPSED_HOURS,
+        .minute = ELAPSED_MINUTES,
+        .second = ELAPSED_SECONDS
+    };
+
+    time_keeping_t elapsed_before = {
+        .hour = ELAPSED_HOURS,
+        .minute = ELAPSED_MINUTES-1,
+        .second = 59
+    };
+
+    time_keeping_t elapsed_after = {
+        .hour = ELAPSED_HOURS,
+        .minute = ELAPSED_MINUTES,
+        .second = ELAPSED_SECONDS+1
+    };
+
+    if ( (time_keeping_multiple_mins(dev_time, elapsed_mins) && (dev_time.second == elapsed_mins.second))
+        || (time_keeping_multiple_mins(dev_time, elapsed_before) && (dev_time.second == elapsed_before.second))
+        || (time_keeping_multiple_mins(dev_time, elapsed_after) && (dev_time.second == elapsed_after.second)) ) {
+        sensors_data = (sensors_data_t) {
+            .temperature = 0.0,
+            .humidity = 0.0,
+            .ambient_light = 0.0,
+            .white_light = 0.0,
+            .soil_moisture = 0.0,
+            .soil_ph = 0.0
+        };
+    } else {
+        sensors_data = sensors_sample();
+    }
     
     String json = "{";
     json += "\"temperature\":";

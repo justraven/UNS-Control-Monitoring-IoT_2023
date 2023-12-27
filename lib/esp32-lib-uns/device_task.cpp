@@ -46,9 +46,9 @@ void dvtask_sensors (void *pvParameters) {
 
     time_keeping_t run_time = time_keeping_get();
     time_keeping_t elapsed_mins = {
-        .hour = 0,
-        .minute = 15,
-        .second = 0
+        .hour = ELAPSED_HOURS,
+        .minute = ELAPSED_MINUTES,
+        .second = ELAPSED_SECONDS
     };
 
     while (1) {
@@ -56,9 +56,10 @@ void dvtask_sensors (void *pvParameters) {
 
         if ( WiFi.status() == WL_CONNECTED 
              && time_keeping_multiple_mins(run_time, elapsed_mins)
-             && (run_time.second == 0) ) {
+             && (run_time.second == elapsed_mins.second) ) {
             sensors_data = sensors_sample();
 
+#ifdef DEVICE_MODE_FULL_FEATURES
             thingspeak = (thingspeak_t) {
                 .api_key = (const char*)THINGSPEAK_API_KEY,
                 .field = {
@@ -68,6 +69,7 @@ void dvtask_sensors (void *pvParameters) {
                     0, 0, 0, 0, 0
                 }
             };
+#endif
 
             if (request_send_get_http(&thingspeak) == REQUEST_HTTP_OK) {
                 Serial.println("[INFO] Data published to ThingSpeak.");

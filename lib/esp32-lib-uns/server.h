@@ -7,6 +7,7 @@
 #include "flags.h"
 #include "sensors.h"
 #include "systime.h"
+#include "status.h"
 
 typedef enum {
     SERVER_SUCCESS,
@@ -27,6 +28,7 @@ void server_handle_client (void); // handle client request
 void server_handle_home (void); // show home page
 void server_handle_configure (void); // handle user form input to change ssid and password
 void server_handle_not_found (void); // show 404 page
+void server_handle_ping (void); // handle ping request
 
 void server_handle_ajax (void); // handle ajax request
 server_flags_t server_create_config (server_config_t *config);
