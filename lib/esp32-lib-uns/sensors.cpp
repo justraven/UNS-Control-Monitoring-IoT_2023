@@ -11,7 +11,7 @@ Adafruit_SHTC3 shtc3 = Adafruit_SHTC3();
 void sensors_init (void) {
 #if !defined(DEVICE_SOIL_MONITOR0) && !defined(DEVICE_SOIL_MONITOR1) && !defined(DEVICE_SOIL_MONITOR2) && !defined(DEVICE_SOIL_MONITOR3) &&\
     !defined(DEVICE_SOIL_MONITOR4) && !defined(DEVICE_SOIL_MONITOR5) && !defined(DEVICE_SOIL_MONITOR6) && !defined(DEVICE_SOIL_MONITOR7)\
-    && !defined(DEVICE_SOIL_MONITOR8)
+    && !defined(DEVICE_SOIL_MONITOR8) && !defined(DEVICE_CONTROLLER_OUTSIDE)
     if (!shtc3.begin()) {
         Serial.println("[ERROR] SHTC3 sensor not found.");
     }
@@ -51,7 +51,7 @@ sensors_data_t sensors_get_data (void) {
 
 #if !defined(DEVICE_SOIL_MONITOR0) && !defined(DEVICE_SOIL_MONITOR1) && !defined(DEVICE_SOIL_MONITOR2) && !defined(DEVICE_SOIL_MONITOR3) &&\
     !defined(DEVICE_SOIL_MONITOR4) && !defined(DEVICE_SOIL_MONITOR5) && !defined(DEVICE_SOIL_MONITOR6) && !defined(DEVICE_SOIL_MONITOR7)\
-    && !defined(DEVICE_SOIL_MONITOR8)
+    && !defined(DEVICE_SOIL_MONITOR8) && !defined(DEVICE_CONTROLLER_OUTSIDE)
     sensors_event_t humidity, temperature;
     shtc3.getEvent(&humidity, &temperature);
 
