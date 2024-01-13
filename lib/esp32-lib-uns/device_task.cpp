@@ -214,13 +214,13 @@ void dvtask_monitor_actuators (void *pvParameters) {
 
     time_keeping_t blower_const_time = {
         .hour = 0,
-        .minute = BLOWERING_TIME_CONSTANT,
+        .minute = (uint8_t)(BLOWERING_TIME_CONSTANT + (uint8_t)(random(0, 3) - 1)),
         .second = 0
     };
 
     time_keeping_t water_const_time = {
         .hour = 0,
-        .minute = WATERING_TIME_CONSTANT,
+        .minute = (uint8_t)(WATERING_TIME_CONSTANT + (uint8_t)(random(0, 3) - 1)),
         .second = 0
     };
 
