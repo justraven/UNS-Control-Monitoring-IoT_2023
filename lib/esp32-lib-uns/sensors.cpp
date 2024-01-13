@@ -50,13 +50,16 @@ sensors_data_t sensors_sample (void) {
     sensors_avg.soil_moisture /= SENSORS_SAMPLE_AVERAGE;
     sensors_avg.soil_ph /= SENSORS_SAMPLE_AVERAGE;
 #elif defined(DEVICE_MONITOR_OLD)
-    sensors_data_t sensors_median[10] = {0.0f};
+    sensors_data_t sensors_median[10];
     sensors_data_t sensors_avg = {0.0f};
 
     for (uint8_t i = 0; i < 10; i++) {
         sensors_median[i].temperature = dht.readTemperature() - FLAGS_DHT_OFFSET_TEMP;
         sensors_median[i].humidity = dht.readHumidity() + FLAGS_DHT_OFFSET_HUMID;
     }
+
+    Serial.println("[INFO] (DHT22:nofilter) temperature: " + String(dht.readTemperature()) + " C");
+    Serial.println("[INFO] (DHT22:nofilter) humidity: " + String(dht.readHumidity()) + " %");
 
     // sort temperature
     for (uint8_t i = 0; i < 10; i++) {
@@ -83,6 +86,9 @@ sensors_data_t sensors_sample (void) {
     // get median
     sensors_avg.temperature = sensors_median[5].temperature;
     sensors_avg.humidity = sensors_median[5].humidity;
+
+    Serial.println("[INFO] (DHT22:filter) temperature: " + String(sensors_avg.temperature) + " C");
+    Serial.println("[INFO] (DHT22:filter) humidity: " + String(sensors_avg.humidity) + " %");
 #endif
 
     return sensors_avg;
