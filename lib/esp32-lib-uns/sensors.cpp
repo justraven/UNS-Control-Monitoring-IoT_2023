@@ -53,13 +53,13 @@ sensors_data_t sensors_sample (void) {
     sensors_data_t sensors_median[10];
     sensors_data_t sensors_avg = {0.0f};
 
+    Serial.println("[INFO] (DHT22:nofilter) temperature: " + String(dht.getTemperature()) + " C");
+    Serial.println("[INFO] (DHT22:nofilter) humidity: " + String(dht.getHumidity()) + " %");
+    
     for (uint8_t i = 0; i < 10; i++) {
         sensors_median[i].temperature = dht.getTemperature() - FLAGS_DHT_OFFSET_TEMP;
         sensors_median[i].humidity = dht.getHumidity() + FLAGS_DHT_OFFSET_HUMID;
     }
-
-    Serial.println("[INFO] (DHT22:nofilter) temperature: " + String(dht.getTemperature()) + " C");
-    Serial.println("[INFO] (DHT22:nofilter) humidity: " + String(dht.getHumidity()) + " %");
 
     // sort temperature
     for (uint8_t i = 0; i < 10; i++) {
@@ -108,6 +108,9 @@ sensors_data_t sensors_get_data (void) {
 
     sensors_data.ambient_light = veml3235_get_als();
     sensors_data.white_light = veml3235_get_white();
+#elif defined(DEVICE_MONITOR_OLD)
+    sensors_data.temperature = dht.getTemperature() - FLAGS_DHT_OFFSET_TEMP;
+    sensors_data.humidity = dht.getHumidity() + FLAGS_DHT_OFFSET_HUMID;
 #endif
 
 #if defined(DEVICE_SOIL_MONITOR0) || defined(DEVICE_SOIL_MONITOR1) || defined(DEVICE_SOIL_MONITOR2) || defined(DEVICE_SOIL_MONITOR3) ||\

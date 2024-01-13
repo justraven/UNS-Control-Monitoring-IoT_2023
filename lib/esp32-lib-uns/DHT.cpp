@@ -182,14 +182,14 @@ void DHTesp::readSensor()
 	pinMode(pin, OUTPUT);
 	if (model == DHT11)
 	{
-		// delay(18);
-		vTaskDelay(18 / portTICK_PERIOD_MS);
+		delay(18);
+		// vTaskDelay(18 / portTICK_PERIOD_MS);
 	}
 	else
 	{
 		// This will fail for a DHT11 - that's how we can detect such a device
-		// delay(2);
-		vTaskDelay(2 / portTICK_PERIOD_MS);
+		delay(2);
+		// vTaskDelay(2 / portTICK_PERIOD_MS);
 	}
 
 	pinMode(pin, INPUT);
