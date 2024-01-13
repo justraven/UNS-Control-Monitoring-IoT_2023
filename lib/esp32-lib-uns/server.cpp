@@ -184,6 +184,7 @@ void server_handle_configure (void) { // configure the device
     "<html>\n"
     "<head>\n"
     "<meta charset=\"utf-8\">\n"
+    "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
     "<title>Configure Page</title>\n"
     "<style>\n"
     "html {\n"
@@ -338,6 +339,7 @@ void server_handle_not_found (void) { // show 404 page
     <html>
     <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>404 Page</title>
     <style>
     html {
@@ -363,6 +365,7 @@ void server_handle_ping (void) {
     <html>
     <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ping Device</title>
     <style>
     html {
