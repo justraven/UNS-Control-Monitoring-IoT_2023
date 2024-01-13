@@ -9,13 +9,13 @@
  */
 
 /************* NOT SEND DATA *************/
-#define CONTROLLER_ENABLE_RELAY     1
-#define CONTROLLER_DISABLE_RELAY    0
+// #define CONTROLLER_ENABLE_RELAY     1
+// #define CONTROLLER_DISABLE_RELAY    0
 
-#define WATERING_TIME_CONSTANT      15 // in minutes
-#define BLOWERING_TIME_CONSTANT     15 // in minutes
+// #define WATERING_TIME_CONSTANT      15 // in minutes
+// #define BLOWERING_TIME_CONSTANT     15 // in minutes
 
-#define DEVICE_CONTROLLER_OUTSIDE   0x00
+// #define DEVICE_CONTROLLER_OUTSIDE   0x00
 /************* NOT SEND DATA *************/
 
 /************* DEVICE-FIELD0 *************/
@@ -39,10 +39,10 @@
 /************* DEVICE-FIELD2 *************/
 
 /*********** OLD-MONITOR-DEVICE **********/
-// #define FLAGS_DHT_OFFSET_TEMP       0.0f
-// #define FLAGS_DHT_OFFSET_HUMID      0.0f
+#define FLAGS_DHT_OFFSET_TEMP       0.0f
+#define FLAGS_DHT_OFFSET_HUMID      0.0f
 
-// #define DEVICE_MONITOR_OLD          0x0C
+#define DEVICE_MONITOR_OLD          0x0C
 /*********** OLD-MONITOR-DEVICE **********/
 
 /************* CONSTANT *************/

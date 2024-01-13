@@ -9,7 +9,7 @@
 Adafruit_SHTC3 shtc3 = Adafruit_SHTC3();
 
 #ifdef DEVICE_MONITOR_OLD
-DHT_Unified dht(DHT_PIN, DHT22);
+DHT dht(DHT_PIN, DHT22);
 #endif // DEVICE_MONITOR_OLD
 
 void sensors_init (void) {
@@ -50,25 +50,21 @@ sensors_data_t sensors_sample (void) {
     sensors_avg.soil_moisture /= SENSORS_SAMPLE_AVERAGE;
     sensors_avg.soil_ph /= SENSORS_SAMPLE_AVERAGE;
 #elif defined(DEVICE_MONITOR_OLD)
-    sensors_event_t humidity, temperature;
     sensors_data_t sensors_median[10] = {0.0f};
     sensors_data_t sensors_avg = {0.0f};
 
-    dht.temperature().getEvent(&temperature);
-    dht.humidity().getEvent(&humidity);
-
     for (uint8_t i = 0; i < 10; i++) {
-        sensors_median[i].temperature = temperature.temperature - FLAGS_DHT_OFFSET_TEMP;
-        sensors_median[i].humidity = humidity.relative_humidity + FLAGS_DHT_OFFSET_HUMID;
+        sensors_median[i].temperature = dht.readTemperature() - FLAGS_DHT_OFFSET_TEMP;
+        sensors_median[i].humidity = dht.readHumidity() + FLAGS_DHT_OFFSET_HUMID;
     }
 
     // sort temperature
     for (uint8_t i = 0; i < 10; i++) {
         for (uint8_t j = i + 1; j < 10; j++) {
             if (sensors_median[i].temperature > sensors_median[j].temperature) {
-                sensors_data_t temp = sensors_median[i];
-                sensors_median[i] = sensors_median[j];
-                sensors_median[j] = temp;
+                float temp = sensors_median[i].temperature;
+                sensors_median[i].temperature = sensors_median[j].temperature;
+                sensors_median[j].temperature = temp;
             }
         }
     }
@@ -77,9 +73,9 @@ sensors_data_t sensors_sample (void) {
     for (uint8_t i = 0; i < 10; i++) {
         for (uint8_t j = i + 1; j < 10; j++) {
             if (sensors_median[i].humidity > sensors_median[j].humidity) {
-                sensors_data_t temp = sensors_median[i];
-                sensors_median[i] = sensors_median[j];
-                sensors_median[j] = temp;
+                float temp = sensors_median[i].humidity;
+                sensors_median[i].humidity = sensors_median[j].humidity;
+                sensors_median[j].humidity = temp;
             }
         }
     }

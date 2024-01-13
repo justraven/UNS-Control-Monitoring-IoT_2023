@@ -8,9 +8,9 @@
 #include "veml3235.h"
 
 #ifdef DEVICE_MONITOR_OLD
-#include <Adafruit_Sensor.h>
+// #include <Adafruit_Sensor.h>
 #include <DHT.h>
-#include <DHT_U.h>
+// #include <DHT_U.h>
 
 #define DHT_PIN     32
 #endif // DEVICE_MONITOR_OLD
