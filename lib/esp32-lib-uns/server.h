@@ -8,6 +8,7 @@
 #include "sensors.h"
 #include "systime.h"
 #include "status.h"
+#include "actuators.h"
 
 typedef enum {
     SERVER_SUCCESS,

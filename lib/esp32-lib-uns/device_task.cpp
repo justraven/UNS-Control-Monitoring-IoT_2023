@@ -91,16 +91,16 @@ void dvtask_sensors (void *pvParameters) {
                 .api_key = (const char*)THINGSPEAK_API_KEY,
                 .field = {
                     0, 0, 0, 0, 0, 0,
-                    sensors_data.soil_moisture,
-                    sensors_data.soil_ph
+                    sensors_data.soil_ph,
+                    sensors_data.soil_moisture
                 }
             };
 #elif defined(DEVICE_SOIL_MONITOR1)
             thingspeak = (thingspeak_t) {
                 .api_key = (const char*)THINGSPEAK_API_KEY,
                 .field = {
-                    sensors_data.soil_moisture,
                     sensors_data.soil_ph,
+                    sensors_data.soil_moisture,
                     0, 0, 0, 0, 0, 0
                 }
             };
@@ -109,8 +109,8 @@ void dvtask_sensors (void *pvParameters) {
                 .api_key = (const char*)THINGSPEAK_API_KEY,
                 .field = {
                     0, 0,
-                    sensors_data.soil_moisture,
                     sensors_data.soil_ph,
+                    sensors_data.soil_moisture,
                     0, 0, 0, 0
                 }
             };
@@ -119,8 +119,8 @@ void dvtask_sensors (void *pvParameters) {
                 .api_key = (const char*)THINGSPEAK_API_KEY,
                 .field = {
                     0, 0, 0, 0,
-                    sensors_data.soil_moisture,
                     sensors_data.soil_ph,
+                    sensors_data.soil_moisture,
                     0, 0
                 }
             };
@@ -129,16 +129,16 @@ void dvtask_sensors (void *pvParameters) {
                 .api_key = (const char*)THINGSPEAK_API_KEY,
                 .field = {
                     0, 0, 0, 0, 0, 0,
-                    sensors_data.soil_moisture,
                     sensors_data.soil_ph,
+                    sensors_data.soil_moisture,
                 }
             };
 #elif defined(DEVICE_SOIL_MONITOR5)
             thingspeak = (thingspeak_t) {
                 .api_key = (const char*)THINGSPEAK_API_KEY,
                 .field = {
-                    sensors_data.soil_moisture,
                     sensors_data.soil_ph,
+                    sensors_data.soil_moisture,
                     0, 0, 0, 0, 0, 0
                 }
             };
@@ -147,8 +147,8 @@ void dvtask_sensors (void *pvParameters) {
                 .api_key = (const char*)THINGSPEAK_API_KEY,
                 .field = {
                     0, 0,
-                    sensors_data.soil_moisture,
                     sensors_data.soil_ph,
+                    sensors_data.soil_moisture,
                     0, 0, 0, 0
                 }
             };
@@ -157,8 +157,8 @@ void dvtask_sensors (void *pvParameters) {
                 .api_key = (const char*)THINGSPEAK_API_KEY,
                 .field = {
                     0, 0, 0, 0,
-                    sensors_data.soil_moisture,
                     sensors_data.soil_ph,
+                    sensors_data.soil_moisture,
                     0, 0
                 }
             };
@@ -167,8 +167,8 @@ void dvtask_sensors (void *pvParameters) {
                 .api_key = (const char*)THINGSPEAK_API_KEY,
                 .field = {
                     0, 0, 0, 0, 0, 0,
-                    sensors_data.soil_moisture,
                     sensors_data.soil_ph,
+                    sensors_data.soil_moisture,
                 }
             };
 #endif
@@ -203,6 +203,18 @@ void dvtask_monitor_actuators (void *pvParameters) {
         .second = ELAPSED_SECONDS
     };
 
+    time_keeping_t blower_const_time = {
+        .hour = 0,
+        .minute = BLOWERING_TIME_CONSTANT,
+        .second = 0
+    };
+
+    time_keeping_t water_const_time = {
+        .hour = 0,
+        .minute = WATERING_TIME_CONSTANT,
+        .second = 0
+    };
+
     while (1) {
         run_time = time_keeping_get();
 
@@ -211,33 +223,31 @@ void dvtask_monitor_actuators (void *pvParameters) {
              && (run_time.second == elapsed_mins.second) ) {
 
             // read temperatures
-            float temperatures_value[2] = {0.0f};
-            float temperatures_average = 0.0f;
-            if (request_read_get_http(&temperatures_value[0], FIELD_TEMPERATURES0) == REQUEST_HTTP_OK
-                && request_read_get_http(&temperatures_value[1], FIELD_TEMPERATURES1) == REQUEST_HTTP_OK) {
-                temperatures_average = (temperatures_value[0] + temperatures_value[1]) / 2.0f;
-            }
+            // float temperatures_value[2] = {0.0f};
+            // float temperatures_average = 0.0f;
+            // if (request_read_get_http(&temperatures_value[0], FIELD_TEMPERATURES0) == REQUEST_HTTP_OK
+            //     && request_read_get_http(&temperatures_value[1], FIELD_TEMPERATURES1) == REQUEST_HTTP_OK) {
+            //     temperatures_average = (temperatures_value[0] + temperatures_value[1]) / 2.0f;
+            // }
 
             // control fan
-            if (temperatures_average > TEMPERATURE_MAXIMUM) {
-                actuators_set(ACTUATORS_RELAY0, 1);
-                Serial.println("[INFO] Fan turned on.");
+            if (time_keeping_multiple_mins(run_time, blower_const_time) && 
+                (run_time.second == blower_const_time.second)) {
+                actuators_set(ACTUATORS_RELAY0, CONTROLLER_ENABLE_RELAY);
+                Serial.println("[INFO] RELAY0 turned on.");
                 status_blink(STATUS_DATA_PUBLISHED, 1, STATUS_DEFAULT_DELAY_MS);
             } else {
-                actuators_set(ACTUATORS_RELAY0, 0);
+                actuators_set(ACTUATORS_RELAY0, CONTROLLER_DISABLE_RELAY);
             }
 
             // read soil moisture
-            float soil_moisture_value = {0.0f};
-
-            if (request_read_get_http(&soil_moisture_value, FIELD_SOIL_MOISTURE0) == REQUEST_HTTP_OK) {
-                if (soil_moisture_value < SOIL_MOISTURE_MINIMUM) {
-                    actuators_set(ACTUATORS_RELAY1, 1);
-                    Serial.println("[INFO] Water pump turned on.");
-                    status_blink(STATUS_DATA_PUBLISHED, 1, STATUS_DEFAULT_DELAY_MS);
-                } else {
-                    actuators_set(ACTUATORS_RELAY1, 0);
-                }
+            if (time_keeping_multiple_mins(run_time, water_const_time) &&
+                (run_time.second == water_const_time.second)) {
+                actuators_set(ACTUATORS_RELAY1, CONTROLLER_ENABLE_RELAY);
+                Serial.println("[INFO] RELAY1 turned on.");
+                status_blink(STATUS_DATA_PUBLISHED, 1, STATUS_DEFAULT_DELAY_MS);
+            } else {
+                actuators_set(ACTUATORS_RELAY1, CONTROLLER_DISABLE_RELAY);
             }
         }
     }

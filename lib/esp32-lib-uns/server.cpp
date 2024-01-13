@@ -180,102 +180,115 @@ void server_handle_home (void) { // show home page
 }
 
 void server_handle_configure (void) { // configure the device
-    String web_html = R"(
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <meta charset="utf-8">
-    <title>Configure Page</title>
-    <style>
-    html {
-    background: linear-gradient(to bottom, #00a8ff, #192a56);
-    color: #ecf0f1;
-    font-family: Arial, Helvetica, sans-serif;
-    height: 100%;
-    }
-    h1 {
-    background-color: #34495e;
-    color: #ecf0f1;
-    padding: 10px;
-    border-radius: 5px;
-    border-bottom: 10px solid #2c3e50;
-    text-align: center;
-    font-size: 30px;
-    margin-top: 20px;
-    font-weight: bold;
-    }
-    form {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-    flex-wrap: wrap;
-    background-color: #34495e;
-    color: #ecf0f1;
-    border-radius: 5px;
-    margin: 10px;
-    padding: 5px;
-    border-bottom: 10px solid #2c3e50;
-    }
-    label {
-    font-size: 20px;
-    }
-    input {
-    font-size: 20px;
-    padding: 5px;
-    border-radius: 5px;
-    border: 2px solid #2c3e50;
-    }
-    input[type=submit] {
-    background-color: #3498db;
-    color: #ecf0f1;
-    padding: 10px;
-    border-radius: 5px;
-    border-bottom: 10px solid #2980b9;
-    text-align: center;
-    font-size: 20px;
-    margin-top: 30px;
-    margin-bottom: 10px;
-    font-weight: bold;
-    }
-    input[type=submit]:hover {
-    transform: translate(2px, 2px);
-    background-color: #2980b9;
-    border-bottom: 10px solid #3498db;
-    }
-    a {
-    background-color: #3498db;
-    color: #ecf0f1;
-    padding: 10px;
-    border-radius: 5px;
-    border-bottom: 10px solid #2980b9;
-    text-align: center;
-    font-size: 20px;
-    margin-top: 30px;
-    margin-bottom: 10px;
-    font-weight: bold;
-    text-decoration: none;
-    }
-    a:hover {
-    transform: translate(2px, 2px);
-    background-color: #2980b9;
-    border-bottom: 10px solid #3498db;
-    }
-    </style>
-    </head>
-    <body>
-    <h1>Configure Page</h1>
-    <form>
-    <label for="ssid">SSID:</label>
-    <input type="text" id="ssid" name="ssid" required><br><br>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" minlength="8" required><br><br>
-    <input type="submit" value="Save">
-    <a href="/">Back to Home</a>
-    </form>
-    </body>
-    </html>
-    )";
+    String web_html = "<!DOCTYPE html>\n"
+    "<html>\n"
+    "<head>\n"
+    "<meta charset=\"utf-8\">\n"
+    "<title>Configure Page</title>\n"
+    "<style>\n"
+    "html {\n"
+    "background: linear-gradient(to bottom, #00a8ff, #192a56);\n"
+    "color: #ecf0f1;\n"
+    "font-family: Arial, Helvetica, sans-serif;\n"
+    "height: 100%;\n"
+    "}\n"
+    "h1 {\n"
+    "background-color: #34495e;\n"
+    "color: #ecf0f1;\n"
+    "padding: 10px;\n"
+    "border-radius: 5px;\n"
+    "border-bottom: 10px solid #2c3e50;\n"
+    "text-align: center;\n"
+    "font-size: 30px;\n"
+    "margin-top: 20px;\n"
+    "font-weight: bold;\n"
+    "}\n"
+    "form {\n"
+    "display: flex;\n"
+    "flex-direction: column;\n"
+    "justify-content: space-around;\n"
+    "align-items: center;\n"
+    "flex-wrap: wrap;\n"
+    "background-color: #34495e;\n"
+    "color: #ecf0f1;\n"
+    "border-radius: 5px;\n"
+    "margin: 10px;\n"
+    "padding: 5px;\n"
+    "border-bottom: 10px solid #2c3e50;\n"
+    "}\n"
+    "label {\n"
+    "font-size: 20px;\n"
+    "}\n"
+    "input {\n"
+    "font-size: 20px;\n"
+    "padding: 5px;\n"
+    "border-radius: 5px;\n"
+    "border: 2px solid #2c3e50;\n"
+    "}\n"
+    "input[type=submit] {\n"
+    "background-color: #3498db;\n"
+    "color: #ecf0f1;\n"
+    "padding: 10px;\n"
+    "border-radius: 5px;\n"
+    "border-bottom: 10px solid #2980b9;\n"
+    "text-align: center;\n"
+    "font-size: 20px;\n"
+    "margin-top: 30px;\n"
+    "margin-bottom: 10px;\n"
+    "font-weight: bold;\n"
+    "}\n"
+    "input[type=submit]:hover {\n"
+    "transform: translate(2px, 2px);\n"
+    "background-color: #2980b9;\n"
+    "border-bottom: 10px solid #3498db;\n"
+    "}\n"
+    "a {\n"
+    "background-color: #3498db;\n"
+    "color: #ecf0f1;\n"
+    "padding: 10px;\n"
+    "border-radius: 5px;\n"
+    "border-bottom: 10px solid #2980b9;\n"
+    "text-align: center;\n"
+    "font-size: 20px;\n"
+    "margin-top: 30px;\n"
+    "margin-bottom: 10px;\n"
+    "font-weight: bold;\n"
+    "text-decoration: none;\n"
+    "}\n"
+    "a:hover {\n"
+    "transform: translate(2px, 2px);\n"
+    "background-color: #2980b9;\n"
+    "border-bottom: 10px solid #3498db;\n"
+    "}\n"
+    "</style>\n"
+    "</head>\n"
+    "<body>\n"
+    "<h1>Configure Page</h1>\n"
+    "<form>\n"
+    "<label for=\"ssid\">SSID:</label>\n"
+    "<input type=\"text\" id=\"ssid\" name=\"ssid\" required><br><br>\n"
+    "<label for=\"password\">Password:</label>\n"
+    "<input type=\"password\" id=\"password\" name=\"password\" minlength=\"8\" required><br><br>\n"
+    "<input type=\"submit\" value=\"Save\">\n"
+#ifdef DEVICE_CONTROLLER_OUTSIDE
+    "</form>\n"
+    "<form>\n"
+    "<label for=\"rname\">Relay:</label>\n"
+    "<select id=\"rname\" name=\"rname\">\n"
+    "<option value=\"R0\">RELAY0</option>\n"
+    "<option value=\"R1\">RELAY1</option>\n"
+    "</select><br>\n"
+    "<label for=\"rvalue\">Value:</label>\n"
+    "<select id=\"rvalue\" name=\"rvalue\">\n"
+    "<option value=\"ON\">Relay ON</option>\n"
+    "<option value=\"OFF\">Relay OFF</option>\n"
+    "</select><br><br>\n"
+    "<input type=\"submit\" value=\"Send\">\n"
+#endif // DEVICE_CONTROLLER_OUTSIDE
+    "<a href=\"/\">Back to Home</a>\n"
+    "</form>\n"
+    "</body>\n"
+    "</html>\n";
 
     if (server.hasArg("ssid") && server.hasArg("password")) {
         server_config_t config = {
@@ -292,9 +305,31 @@ void server_handle_configure (void) { // configure the device
         server.send(302, "text/plain", "");
 
         ESP.restart();
-    }
+    } 
+#ifdef DEVICE_CONTROLLER_OUTSIDE
+    else if (server.hasArg("rvalue")) {
+        if (server.arg("rvalue") == "ON") {
+            if (server.arg("rname") == "R0") {
+                actuators_set(ACTUATORS_RELAY0, CONTROLLER_ENABLE_RELAY);
+            } else if (server.arg("rname") == "R1") {
+                actuators_set(ACTUATORS_RELAY1, CONTROLLER_ENABLE_RELAY);
+            }
+        } else if (server.arg("rvalue") == "OFF") {
+            if (server.arg("rname") == "R0") {
+                actuators_set(ACTUATORS_RELAY0, CONTROLLER_DISABLE_RELAY);
+            } else if (server.arg("rname") == "R1") {
+                actuators_set(ACTUATORS_RELAY1, CONTROLLER_DISABLE_RELAY);
+            }
+        }
 
-    server.send(200, "text/html", web_html);
+        Serial.println("[WEB:FORM] Relay : " + server.arg("relay"));
+        server.sendHeader("Location", String("/"), true);
+        server.send(302, "text/plain", "");
+    }
+#endif // DEVICE_CONTROLLER_OUTSIDE
+    else {
+        server.send(200, "text/html", web_html);
+    }
 }
 
 void server_handle_not_found (void) { // show 404 page
