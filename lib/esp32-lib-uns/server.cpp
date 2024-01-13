@@ -322,7 +322,7 @@ void server_handle_configure (void) { // configure the device
             }
         }
 
-        Serial.println("[WEB:FORM] Relay : " + server.arg("relay"));
+        Serial.println("[WEB:FORM] Relay (" + server.arg("rname") + ") : " + server.arg("rvalue"));
         server.sendHeader("Location", String("/"), true);
         server.send(302, "text/plain", "");
     }
