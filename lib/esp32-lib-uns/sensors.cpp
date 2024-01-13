@@ -9,7 +9,7 @@
 Adafruit_SHTC3 shtc3 = Adafruit_SHTC3();
 
 #ifdef DEVICE_MONITOR_OLD
-DHT dht(DHT_PIN, DHT22);
+DHTesp dht;
 #endif // DEVICE_MONITOR_OLD
 
 void sensors_init (void) {
@@ -24,7 +24,7 @@ void sensors_init (void) {
         Serial.println("[ERROR] VEML3235 sensor not found.");
     }
 #elif defined(DEVICE_MONITOR_OLD)
-    dht.begin();
+    dht.setup(DHT_PIN, DHTesp::DHT22);
 #endif
 }
 
@@ -54,12 +54,12 @@ sensors_data_t sensors_sample (void) {
     sensors_data_t sensors_avg = {0.0f};
 
     for (uint8_t i = 0; i < 10; i++) {
-        sensors_median[i].temperature = dht.readTemperature() - FLAGS_DHT_OFFSET_TEMP;
-        sensors_median[i].humidity = dht.readHumidity() + FLAGS_DHT_OFFSET_HUMID;
+        sensors_median[i].temperature = dht.getTemperature() - FLAGS_DHT_OFFSET_TEMP;
+        sensors_median[i].humidity = dht.getHumidity() + FLAGS_DHT_OFFSET_HUMID;
     }
 
-    Serial.println("[INFO] (DHT22:nofilter) temperature: " + String(dht.readTemperature()) + " C");
-    Serial.println("[INFO] (DHT22:nofilter) humidity: " + String(dht.readHumidity()) + " %");
+    Serial.println("[INFO] (DHT22:nofilter) temperature: " + String(dht.getTemperature()) + " C");
+    Serial.println("[INFO] (DHT22:nofilter) humidity: " + String(dht.getHumidity()) + " %");
 
     // sort temperature
     for (uint8_t i = 0; i < 10; i++) {
