@@ -7,6 +7,14 @@
 #include "flags.h"
 #include "veml3235.h"
 
+#ifdef DEVICE_MONITOR_OLD
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+#include <DHT_U.h>
+
+#define DHT_PIN     32
+#endif // DEVICE_MONITOR_OLD
+
 #define SENSORS_SAMPLE_AVERAGE      50
 #define SENSORS_TEMP_OFFSET         12.879f
 #define SENSORS_HUMID_OFFSET        8.328f

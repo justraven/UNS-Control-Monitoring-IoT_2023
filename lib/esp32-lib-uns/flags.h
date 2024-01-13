@@ -39,6 +39,9 @@
 /************* DEVICE-FIELD2 *************/
 
 /*********** OLD-MONITOR-DEVICE **********/
+#define FLAGS_DHT_OFFSET_TEMP       0.0f
+#define FLAGS_DHT_OFFSET_HUMID      0.0f
+
 #define DEVICE_MONITOR_OLD          0x0C
 /*********** OLD-MONITOR-DEVICE **********/
 

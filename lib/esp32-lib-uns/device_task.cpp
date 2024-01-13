@@ -171,6 +171,15 @@ void dvtask_sensors (void *pvParameters) {
                     sensors_data.soil_moisture,
                 }
             };
+#elif defined(DEVICE_MONITOR_OLD)
+            thingspeak = (thingspeak_t) {
+                .api_key = (const char*)THINGSPEAK_API_KEY,
+                .field = {
+                    sensors_data.temperature,
+                    sensors_data.humidity,
+                    0, 0, 0, 0, 0, 0
+                }
+            };
 #endif
 
             if (request_send_get_http(&thingspeak) == REQUEST_HTTP_OK) {

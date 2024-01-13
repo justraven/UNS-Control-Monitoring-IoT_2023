@@ -8,10 +8,14 @@
 
 Adafruit_SHTC3 shtc3 = Adafruit_SHTC3();
 
+#ifdef DEVICE_MONITOR_OLD
+DHT_Unified dht(DHT_PIN, DHT22);
+#endif // DEVICE_MONITOR_OLD
+
 void sensors_init (void) {
 #if !defined(DEVICE_SOIL_MONITOR0) && !defined(DEVICE_SOIL_MONITOR1) && !defined(DEVICE_SOIL_MONITOR2) && !defined(DEVICE_SOIL_MONITOR3) &&\
     !defined(DEVICE_SOIL_MONITOR4) && !defined(DEVICE_SOIL_MONITOR5) && !defined(DEVICE_SOIL_MONITOR6) && !defined(DEVICE_SOIL_MONITOR7)\
-    && !defined(DEVICE_SOIL_MONITOR8) && !defined(DEVICE_CONTROLLER_OUTSIDE)
+    && !defined(DEVICE_SOIL_MONITOR8) && !defined(DEVICE_CONTROLLER_OUTSIDE) && !defined(DEVICE_MONITOR_OLD)
     if (!shtc3.begin()) {
         Serial.println("[ERROR] SHTC3 sensor not found.");
     }
@@ -19,10 +23,13 @@ void sensors_init (void) {
     if (veml3235_init() != VEML3235_ID_VALUE) {
         Serial.println("[ERROR] VEML3235 sensor not found.");
     }
+#elif defined(DEVICE_MONITOR_OLD)
+    dht.begin();
 #endif
 }
 
 sensors_data_t sensors_sample (void) {
+#ifndef DEVICE_MONITOR_OLD
     sensors_data_t sensors_avg = {0.0f};
 
     for (uint8_t i = 0; i < SENSORS_SAMPLE_AVERAGE; i++) {
@@ -42,6 +49,45 @@ sensors_data_t sensors_sample (void) {
     sensors_avg.white_light /= SENSORS_SAMPLE_AVERAGE;
     sensors_avg.soil_moisture /= SENSORS_SAMPLE_AVERAGE;
     sensors_avg.soil_ph /= SENSORS_SAMPLE_AVERAGE;
+#elif defined(DEVICE_MONITOR_OLD)
+    sensors_event_t humidity, temperature;
+    sensors_data_t sensors_median[10] = {0.0f};
+    sensors_data_t sensors_avg = {0.0f};
+
+    dht.temperature().getEvent(&temperature);
+    dht.humidity().getEvent(&humidity);
+
+    for (uint8_t i = 0; i < 10; i++) {
+        sensors_median[i].temperature = temperature.temperature - FLAGS_DHT_OFFSET_TEMP;
+        sensors_median[i].humidity = humidity.relative_humidity + FLAGS_DHT_OFFSET_HUMID;
+    }
+
+    // sort temperature
+    for (uint8_t i = 0; i < 10; i++) {
+        for (uint8_t j = i + 1; j < 10; j++) {
+            if (sensors_median[i].temperature > sensors_median[j].temperature) {
+                sensors_data_t temp = sensors_median[i];
+                sensors_median[i] = sensors_median[j];
+                sensors_median[j] = temp;
+            }
+        }
+    }
+
+    // sort humidity
+    for (uint8_t i = 0; i < 10; i++) {
+        for (uint8_t j = i + 1; j < 10; j++) {
+            if (sensors_median[i].humidity > sensors_median[j].humidity) {
+                sensors_data_t temp = sensors_median[i];
+                sensors_median[i] = sensors_median[j];
+                sensors_median[j] = temp;
+            }
+        }
+    }
+
+    // get median
+    sensors_avg.temperature = sensors_median[5].temperature;
+    sensors_avg.humidity = sensors_median[5].humidity;
+#endif
 
     return sensors_avg;
 }
@@ -51,7 +97,7 @@ sensors_data_t sensors_get_data (void) {
 
 #if !defined(DEVICE_SOIL_MONITOR0) && !defined(DEVICE_SOIL_MONITOR1) && !defined(DEVICE_SOIL_MONITOR2) && !defined(DEVICE_SOIL_MONITOR3) &&\
     !defined(DEVICE_SOIL_MONITOR4) && !defined(DEVICE_SOIL_MONITOR5) && !defined(DEVICE_SOIL_MONITOR6) && !defined(DEVICE_SOIL_MONITOR7)\
-    && !defined(DEVICE_SOIL_MONITOR8) && !defined(DEVICE_CONTROLLER_OUTSIDE)
+    && !defined(DEVICE_SOIL_MONITOR8) && !defined(DEVICE_CONTROLLER_OUTSIDE) && !defined(DEVICE_MONITOR_OLD)
     sensors_event_t humidity, temperature;
     shtc3.getEvent(&humidity, &temperature);
 
