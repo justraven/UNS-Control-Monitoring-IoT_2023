@@ -261,7 +261,7 @@ void dvtask_monitor_actuators (void *pvParameters) {
             }
             
             if (time_keeping_multiple_hours(run_time, water_const_time) &&
-                time_keeping_multiple_mins(run_time, water_const_time) &&
+                (run_time.minute == 3) &&
                 (run_time.second == water_const_time.second)) {
                 actuators_set(ACTUATORS_RELAY0, CONTROLLER_DISABLE_RELAY);
                 Serial.println("[INFO] RELAY0 turned off.");
