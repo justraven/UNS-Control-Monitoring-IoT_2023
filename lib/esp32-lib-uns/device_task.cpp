@@ -219,8 +219,8 @@ void dvtask_monitor_actuators (void *pvParameters) {
     };
 
     time_keeping_t water_const_time = {
-        .hour = 0,
-        .minute = (uint8_t)(WATERING_TIME_CONSTANT + (uint8_t)(random(0, 3) - 1)),
+        .hour = 2,
+        .minute = 0,
         .second = 0
     };
 
@@ -250,10 +250,17 @@ void dvtask_monitor_actuators (void *pvParameters) {
             }
 
             // read soil moisture
-            if (time_keeping_multiple_mins(run_time, water_const_time) &&
+            if (time_keeping_multiple_hours(run_time, water_const_time) &&
+                (run_time.second == water_const_time.minute) &&
                 (run_time.second == water_const_time.second)) {
                 actuators_set(ACTUATORS_RELAY1, CONTROLLER_ENABLE_RELAY);
                 Serial.println("[INFO] RELAY1 turned on.");
+                status_blink(STATUS_DATA_PUBLISHED, 1, STATUS_DEFAULT_DELAY_MS);
+            } else if (time_keeping_multiple_hours(run_time, water_const_time) &&
+                (run_time.minute == 3) && // after 3 minutes, turn off
+                (run_time.second == water_const_time.second)) {
+                actuators_set(ACTUATORS_RELAY1, CONTROLLER_DISABLE_RELAY);
+                Serial.println("[INFO] RELAY1 turned off.");
                 status_blink(STATUS_DATA_PUBLISHED, 1, STATUS_DEFAULT_DELAY_MS);
             } else {
                 actuators_set(ACTUATORS_RELAY1, CONTROLLER_DISABLE_RELAY);

@@ -32,4 +32,12 @@ uint8_t time_keeping_multiple_mins (time_keeping_t first, time_keeping_t multipl
     }
 }
 
+uint8_t time_keeping_multiple_hours (time_keeping_t first, time_keeping_t multiple) {
+    if ((first.hour % multiple.hour) == 0) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 
